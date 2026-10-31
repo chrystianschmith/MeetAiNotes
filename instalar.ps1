@@ -1,4 +1,4 @@
-﻿# Instalador do Ata.
+﻿# Instalador do MeetAiNotes.
 # Baixa os motores e modelos das fontes oficiais, confere o SHA-256 de cada arquivo e cria o atalho.
 # Pode ser executado de novo a qualquer momento: o que já estiver baixado e íntegro é mantido.
 param(
@@ -55,7 +55,7 @@ $Downloads = @(
 )
 
 $NodePortatil = @{
-  Nome = 'Node.js 22.23.4 (portátil, só para o Ata)'
+  Nome = 'Node.js 22.23.4 (portátil, só para o MeetAiNotes)'
   Url = 'https://nodejs.org/dist/v22.23.4/node-v22.23.4-win-x64.zip'
   Sha = 'cbc74b5e0982c9dbb41525fd8fb5dcd32fbee237863f7829072f4639a1ce5f20'
   Arquivo = 'engines\node.zip'
@@ -121,11 +121,11 @@ function Node-Compativel {
 
 try {
   Escrever ''
-  Escrever '=== Instalação do Ata ===' 'White'
+  Escrever '=== Instalação do MeetAiNotes ===' 'White'
   Escrever "Pasta: $Root"
 
-  if ([Environment]::OSVersion.Version.Major -lt 10) { throw 'O Ata precisa do Windows 10 ou 11.' }
-  if (-not [Environment]::Is64BitOperatingSystem) { throw 'O Ata precisa de um Windows de 64 bits.' }
+  if ([Environment]::OSVersion.Version.Major -lt 10) { throw 'O MeetAiNotes precisa do Windows 10 ou 11.' }
+  if (-not [Environment]::Is64BitOperatingSystem) { throw 'O MeetAiNotes precisa de um Windows de 64 bits.' }
   if (-not (Get-Command curl.exe -ErrorAction SilentlyContinue)) { throw 'curl.exe não encontrado (vem com o Windows 10 1803 ou mais novo).' }
 
   $livreGB = [math]::Round((Get-PSDrive ((Resolve-Path $Root).Drive.Name)).Free / 1GB, 1)
@@ -134,7 +134,7 @@ try {
   $ramGB = [math]::Round((New-Object Microsoft.VisualBasic.Devices.ComputerInfo).TotalPhysicalMemory / 1GB)
   if ($ramGB -lt 12) { Escrever "Aviso: este computador tem $ramGB GB de RAM. Recomendamos 16 GB; com menos, as notas podem demorar bastante." 'Yellow' }
 
-  # Arquivos baixados do GitHub vêm marcados como "da internet"; desbloqueia os do próprio Ata.
+  # Arquivos baixados do GitHub vêm marcados como "da internet"; desbloqueia os do próprio MeetAiNotes.
   Get-ChildItem $Root -Recurse -File -ErrorAction SilentlyContinue |
     Where-Object { $_.FullName -notlike '*\engines\*' -and $_.FullName -notlike '*\data\*' } |
     ForEach-Object { Remove-Item -LiteralPath $_.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue }
@@ -157,19 +157,19 @@ try {
 
   if (-not $SemAtalho) {
     $desktop = [Environment]::GetFolderPath('Desktop')
-    $atalho = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $desktop 'Ata.lnk'))
+    $atalho = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $desktop 'MeetAiNotes.lnk'))
     $atalho.TargetPath = 'wscript.exe'
-    $atalho.Arguments = '"' + (Join-Path $Root 'Ata.vbs') + '"'
+    $atalho.Arguments = '"' + (Join-Path $Root 'MeetAiNotes.vbs') + '"'
     $atalho.WorkingDirectory = $Root
     $atalho.IconLocation = "$env:SystemRoot\System32\imageres.dll,109"
-    $atalho.Description = 'Ata - caderno de reuniões'
+    $atalho.Description = 'MeetAiNotes - caderno de reuniões'
     $atalho.Save()
     Escrever ''
-    Escrever "Atalho criado: $desktop\Ata.lnk"
+    Escrever "Atalho criado: $desktop\MeetAiNotes.lnk"
   }
 
   Escrever ''
-  Escrever 'Pronto! Abra o Ata pelo atalho na área de trabalho (ou com dois cliques em Ata.vbs).' 'Green'
+  Escrever 'Pronto! Abra o MeetAiNotes pelo atalho na área de trabalho (ou com dois cliques em MeetAiNotes.vbs).' 'Green'
 } catch {
   Escrever ''
   Escrever "ERRO: $($_.Exception.Message)" 'Red'

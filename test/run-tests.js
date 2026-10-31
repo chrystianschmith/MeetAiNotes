@@ -1,4 +1,4 @@
-// Testes de ponta a ponta do Ata com motores simulados (não precisa dos modelos baixados).
+// Testes de ponta a ponta do MeetAiNotes com motores simulados (não precisa dos modelos baixados).
 // Uso: node test/run-tests.js
 const assert = require("node:assert/strict");
 const { spawn } = require("node:child_process");
@@ -14,7 +14,7 @@ const BASE = `http://127.0.0.1:${PORTS.app}/api`;
 const ORIGIN = { Origin: `http://127.0.0.1:${PORTS.app}` };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ata-test-"));
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "meetainotes-test-"));
 const cfgPath = path.join(tmp, "config.json");
 const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, "config.example.json"), "utf8"));
 Object.assign(cfg, { port: PORTS.app, dataDir: path.join(tmp, "data"), user: { name: "Maria", aliases: ["Mari"] } });
@@ -25,7 +25,7 @@ fs.writeFileSync(cfgPath, JSON.stringify(cfg));
 
 let server;
 function startServer() {
-  server = spawn(process.execPath, ["--no-warnings", path.join(ROOT, "server.js")], { env: { ...process.env, ATA_CONFIG: cfgPath }, stdio: "ignore" });
+  server = spawn(process.execPath, ["--no-warnings", path.join(ROOT, "server.js")], { env: { ...process.env, MEETAINOTES_CONFIG: cfgPath }, stdio: "ignore" });
   return waitFor(async () => (await fetch(`${BASE}/status`)).ok);
 }
 async function waitFor(fn, ms = 15000) {

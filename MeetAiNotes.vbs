@@ -1,4 +1,4 @@
-' Abre o Ata: inicia o servidor local (sem janela) e abre o app no Edge.
+' Abre o MeetAiNotes: inicia o servidor local (sem janela) e abre o app no Edge.
 Set sh = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 dir = fso.GetParentFolderName(WScript.ScriptFullName)
@@ -11,7 +11,7 @@ If Not fso.FileExists(node) Then node = "node"
 On Error Resume Next
 sh.Run """" & node & """ --no-warnings server.js", 0, False
 If Err.Number <> 0 Then
-  MsgBox "Nao encontrei o Node.js. Rode o instalar.cmd novamente.", 16, "Ata"
+  MsgBox "Nao encontrei o Node.js. Rode o instalar.cmd novamente.", 16, "MeetAiNotes"
   WScript.Quit 1
 End If
 On Error GoTo 0

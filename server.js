@@ -1,4 +1,4 @@
-// Ata: gravador e caderno de reuniões 100% local.
+// MeetAiNotes: gravador e caderno de reuniões 100% local.
 // Uso: node server.js  ->  http://127.0.0.1:4280
 const http = require("node:http");
 const fs = require("node:fs");
@@ -11,8 +11,8 @@ const { Transcriber } = require("./lib/transcriber");
 const { createSummarizer } = require("./lib/summarizer");
 
 const ROOT = __dirname;
-// ATA_CONFIG permite apontar outra configuração (usado pelos testes automatizados).
-const CONFIG_PATH = process.env.ATA_CONFIG || path.join(ROOT, "config.json");
+// MEETAINOTES_CONFIG permite apontar outra configuração (usado pelos testes automatizados).
+const CONFIG_PATH = process.env.MEETAINOTES_CONFIG || path.join(ROOT, "config.json");
 if (!fs.existsSync(CONFIG_PATH)) fs.copyFileSync(path.join(ROOT, "config.example.json"), CONFIG_PATH);
 let config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
 const getConfig = () => config;
@@ -21,14 +21,14 @@ const DATA = path.resolve(ROOT, config.dataDir || "data");
 const AUDIO_DIR = path.join(DATA, "audio");
 fs.mkdirSync(AUDIO_DIR, { recursive: true });
 
-const LOG_PATH = path.join(DATA, "ata.log");
+const LOG_PATH = path.join(DATA, "meetainotes.log");
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}`;
   console.log(line);
   fs.appendFileSync(LOG_PATH, line + "\n");
 }
 
-const db = openDb(path.join(DATA, "ata.sqlite"));
+const db = openDb(path.join(DATA, "meetainotes.sqlite"));
 const engines = createEngines(config, ROOT, DATA, log);
 const summarizer = createSummarizer({ db, engines, getConfig, log });
 
@@ -364,13 +364,13 @@ process.on("exit", () => engines.stopAll());
 
 server.on("error", e => {
   if (e.code === "EADDRINUSE") {
-    console.log(`Ata já está rodando em http://127.0.0.1:${config.port}`);
+    console.log(`MeetAiNotes já está rodando em http://127.0.0.1:${config.port}`);
     process.exit(0);
   }
   throw e;
 });
 
 server.listen(config.port, "127.0.0.1", () => {
-  log(`Ata rodando em http://127.0.0.1:${config.port}`);
+  log(`MeetAiNotes rodando em http://127.0.0.1:${config.port}`);
   recoverInterrupted();
 });

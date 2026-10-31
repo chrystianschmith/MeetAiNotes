@@ -1,6 +1,14 @@
-// Interface do Ata: caderno de reuniões, gravação, tarefas e perguntas.
+// Interface do MeetAiNotes: caderno de reuniões, gravação, tarefas e perguntas.
 const main = document.getElementById("main");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+// Markdown simples das respostas do modelo: negrito, títulos e listas (o texto já sai escapado).
+const md = s => esc(s)
+  .replace(/^#{1,6}\s+(.+)$/gm, "<strong>$1</strong>")
+  .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+  .replace(/^(\s*)[*-]\s+/gm, "$1• ")
+  .replace(/\n{3,}/g, "\n\n")
+  .trim();
 
 async function api(path, method = "GET", body) {
   const opts = { method };
@@ -462,7 +470,7 @@ function renderChat({ meeting: m, chat }) {
   const body = document.getElementById("m-body");
   const suggestions = ["Quais são as minhas tarefas e prazos?", "O que ficou decidido?", "Escreva um e-mail curto de follow-up", "O que ficou em aberto?"];
   body.innerHTML = `
-    <div class="chat" id="chat">${chat.map(c => `<div class="msg ${c.role}">${esc(c.content)}</div>`).join("")}</div>
+    <div class="chat" id="chat">${chat.map(c => `<div class="msg ${c.role}">${c.role === "assistant" ? md(c.content) : esc(c.content)}</div>`).join("")}</div>
     ${chat.length ? "" : `<p class="muted">Pergunte qualquer coisa sobre esta reunião. A resposta vem só da transcrição e das notas, processadas no seu computador.</p>`}
     <div class="suggestions">${suggestions.map(q => `<button>${esc(q)}</button>`).join("")}</div>
     <form class="chat-form" id="chat-form"><input type="text" placeholder="Sua pergunta…" autocomplete="off"><button class="btn primary">Perguntar</button></form>`;
@@ -474,7 +482,7 @@ function renderChat({ meeting: m, chat }) {
     list.insertAdjacentHTML("beforeend", `<div class="msg user">${esc(q)}</div><div class="msg assistant muted" id="thinking">Pensando… (a primeira pergunta carrega o modelo e pode levar um ou dois minutos)</div>`);
     try {
       const { answer } = await api(`/meetings/${m.id}/chat`, "POST", { question: q });
-      document.getElementById("thinking").outerHTML = `<div class="msg assistant">${esc(answer)}</div>`;
+      document.getElementById("thinking").outerHTML = `<div class="msg assistant">${md(answer)}</div>`;
     } catch (e) {
       document.getElementById("thinking").textContent = "Erro: " + e.message;
     }
@@ -541,7 +549,7 @@ async function renderSettings() {
       <div>Transcrição (Whisper): <b>${status.whisper ? "carregado" : "inicia quando necessário"}</b></div>
       <div>Notas e perguntas (Qwen): <b>${status.llm ? "carregado" : "inicia quando necessário"}</b></div>
       <p class="muted" style="margin-bottom:0">Tudo roda neste computador. Nenhum áudio, texto ou nota é enviado para a internet.</p>
-      <div class="actions"><button class="btn danger" id="quit">Encerrar o Ata</button></div>
+      <div class="actions"><button class="btn danger" id="quit">Encerrar o MeetAiNotes</button></div>
     </div>
   </div>`;
   const split = v => v.split(",").map(x => x.trim()).filter(Boolean);
@@ -561,9 +569,9 @@ async function renderSettings() {
   };
   document.getElementById("quit").onclick = async () => {
     if (rec.active) return alert("Pare a gravação primeiro.");
-    if (!confirm("Encerrar o Ata e liberar a memória dos modelos?")) return;
+    if (!confirm("Encerrar o MeetAiNotes e liberar a memória dos modelos?")) return;
     await api("/shutdown", "POST");
-    main.innerHTML = `<div class="empty">O Ata foi encerrado. Pode fechar esta janela.</div>`;
+    main.innerHTML = `<div class="empty">O MeetAiNotes foi encerrado. Pode fechar esta janela.</div>`;
   };
 }
 
@@ -571,12 +579,12 @@ async function renderSettings() {
 
 function renderWelcome() {
   main.innerHTML = `<div class="page">
-    <h1>Bem-vindo ao Ata</h1>
+    <h1>Bem-vindo ao MeetAiNotes</h1>
     <p class="muted">Grave suas reuniões e receba as notas com tópicos principais e as tarefas que são suas.
       Tudo é processado neste computador; nada é enviado para a internet.</p>
     <form class="card" id="welcome" style="margin-top:20px">
       <label class="field"><span>Como você se chama?</span>
-        <small>É assim que o Ata reconhece, na conversa, as tarefas que são suas.</small>
+        <small>É assim que o MeetAiNotes reconhece, na conversa, as tarefas que são suas.</small>
         <input type="text" name="name" required autofocus placeholder="Ex.: Maria"></label>
       <label class="field"><span>Apelidos ou sobrenome (opcional)</span><small>Separados por vírgula.</small>
         <input type="text" name="aliases" placeholder="Ex.: Mari, Silva"></label>
@@ -610,7 +618,7 @@ async function render() {
       const meetings = await renderSidebar();
       if (meetings.length) return (location.hash = "#/tarefas");
       main.innerHTML = `<div class="empty"><h1>Seu caderno de reuniões</h1>
-        <p>Grave uma reunião e o Ata transcreve, separa os tópicos principais e lista as tarefas que são suas.</p>
+        <p>Grave uma reunião e o MeetAiNotes transcreve, separa os tópicos principais e lista as tarefas que são suas.</p>
         <p><a class="btn rec big" href="#/gravar">● Começar a primeira gravação</a></p></div>`;
     }
   } catch (e) {
