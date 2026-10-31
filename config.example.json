@@ -1,0 +1,30 @@
+{
+  "port": 4280,
+  "dataDir": "data",
+  "language": "pt",
+  "user": {
+    "name": "",
+    "aliases": []
+  },
+  "vocabulary": [],
+  "captureSystemAudio": true,
+  "whisper": {
+    "exe": "engines/whisper/Release/whisper-server.exe",
+    "mode": "preciso",
+    "models": {
+      "preciso": "engines/models/ggml-large-v3-turbo-q5_0.bin",
+      "rapido": "engines/models/ggml-small-q5_1.bin"
+    },
+    "vadModel": "engines/models/ggml-silero-v5.1.2.bin",
+    "port": 4281,
+    "threads": 0
+  },
+  "llm": {
+    "exe": "engines/llama/llama-server.exe",
+    "model": "engines/models/Qwen3.5-4B-Q4_K_M.gguf",
+    "port": 4282,
+    "contextSize": 32768,
+    "gpuLayers": 99,
+    "threads": 0
+  }
+}

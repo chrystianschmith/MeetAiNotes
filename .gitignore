@@ -1,0 +1,8 @@
+# Motores e modelos (baixados pelo instalar.cmd, ~3,3 GB)
+engines/
+# Gravações, transcrições e banco de dados de quem usa
+data/
+# Configuração pessoal (nome, apelidos); o modelo é config.example.json
+config.json
+node_modules/
+*.log
